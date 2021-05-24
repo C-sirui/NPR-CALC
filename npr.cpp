@@ -5,122 +5,204 @@
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
 //============================================================================
-
+#include <string>
 #include <iostream>
 #include <stack>
 #include <stdio.h>
 #include <cstring>
+#include <sstream>
+#include <vector>
+#include <stdlib.h>
+#include <math.h>
+
 using namespace std;
 
-char ch[100]; //input
-char numsym[100]; // anti-dutch
+string ch; //input
+string numsym[100]; // anti-dutch
 
-int prio(char ch){
+// to make switch/cases support string
+constexpr std::uint32_t hash_str_to_uint32(const char* data)
+{
+	std::uint32_t h(0);
+	for (int i = 0; data && ('\0' != data[i]); i++)
+		h = (h << 6) ^ (h >> 26) ^ data[i];
+	return h;
+}
+
+// set up priority
+int prio(string ck){
 	int ans;
-	switch(ch){
-	case'(':ans=0;break;
-	case'+':
-	case'-':ans=1;break;
-	case'*':
-	case'/':ans=2;break;
-	case')':ans=3;break;
+	const char* ch = ck.c_str();
+	switch(hash_str_to_uint32(ch)){
+	case hash_str_to_uint32("("):ans=0;break;
+	case hash_str_to_uint32("+"):
+	case hash_str_to_uint32("-"):ans=1;break;
+	case hash_str_to_uint32("*"):
+	case hash_str_to_uint32("/"):ans=2;break;
+	case hash_str_to_uint32(")"):ans=3;break;
 	default:ans=-1;break;
 	}
 	return ans;
 }
 
+// check if char a is +-*/
+int isCharSymbol(char a){
+
+	if(a=='+' || a=='-'
+			|| a=='*'
+					|| a=='/'
+							|| a=='('
+									|| a==')'){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+
+}
+
+// check if string b is +-*/
+int isStringSymbol(string b){
+
+	if(b=="+" || b=="-"
+			|| b=="*"
+					|| b=="/"
+							|| b=="("
+									|| b==")"){
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
+// cin get input and convert it to 后缀表达式 of string array
 void convert(){
-	scanf("%s",ch);
-	stack<char> symbol;
-	int i = 0; // counter for numsym[]
-	int n = 0; // counter for ch[]
-	while(ch[n]!='\0'){
-		if(ch[n]<='9' && ch[n]>='0'){
-			numsym[i++]=ch[n];
+
+	cin>>ch;
+	stack<string> symbol;
+	//-----------seperated with space
+	for(int i=1; i<=ch.length(); i++){
+		if(isCharSymbol(ch[i])==1){
+			ch.insert(i," ");
+			i++;
+			ch.insert(++i," ");
 		}
-		else if(ch[n]=='('){
-			symbol.push(ch[n]);
+	}
+	//	cout<<ch<<"end"<<endl;
+
+	//to string array with delimitor ' '
+	vector<string> cin;
+	stringstream ss(ch);
+	string tmp;
+	while(std::getline(ss, tmp, ' '))
+	{
+		cin.push_back(tmp);
+	}
+
+
+	//to 后缀
+	int i = 0; // counter for numsym;
+	for (string n : cin){
+		if(isStringSymbol(n)==0){
+			numsym[i++]=n;
 		}
-		else if(ch[n]==')'){
-			while(symbol.top()!='('){
+		else if(n=="("){
+			symbol.push(n);
+		}
+		else if(n==")"){
+			while(symbol.top()!="("){
 				numsym[i++]=symbol.top();
 				symbol.pop();
 			}
 			symbol.pop();
 		}
-		else if(symbol.empty()||prio(*ch)>prio(symbol.top())){ //empty check should be ahead, or top() dead end
-			symbol.push(ch[n]);
+		else if(symbol.empty()||prio(n)>prio(symbol.top())){ //empty check should be ahead, or top() dead end
+			symbol.push(n);
 		}
 		else{
-			while(prio(ch[n])<prio(symbol.top())){
+			while(prio(n)<prio(symbol.top())){
 				numsym[i++]=symbol.top();
 				symbol.pop();
 				if(symbol.empty()){
 					break;
 				}
 			}
-			symbol.push(ch[n]);
+			symbol.push(n);
 		}
-		n++;
 	}
+
+	// remaining symbols exit stack
 	while(!symbol.empty()){
 		numsym[i++]=symbol.top();
 		symbol.pop();
 	}
+
+	// print 後綴
+	//	int m = 0;
+	//	cout<<m;
+	//	for(string k : numsym){
+	//		m=m+1;
+	//	}
+	//	cout<<m;
 }
 
+// convert string to float
+float stringToNum(string str){
+	istringstream iss(str);
+	float num;
+	iss >> num;
+	return num;
+}
 
-
+// calculation with float
 void calc(){
 	stack<float> numbers;
-	int k=0; // counter for numsym[]
 	float num; // temporary holder
-	while(numsym[k]!='\0'){
-		if(numsym[k]<='9' && numsym[k]>='0'){
-			numbers.push((float)numsym[k]-48);
+	int i = 0; // counter for numsym
+	while(numsym[i]!="\0"){
+		if(isStringSymbol(numsym[i])==0){
+			numbers.push(stringToNum(numsym[i]));
 		}
-		else if(numsym[k]=='+'
-				|| numsym[k]=='-'
-						|| numsym[k]=='*'
-								|| numsym[k]=='/'){
+		else if(isStringSymbol(numsym[i])==1){
+			// operand
 			float a = numbers.top();
 			numbers.pop();
 			float b = numbers.top();
 			numbers.pop();
-			switch(numsym[k]){
-			case'+':
-				num = (a+b);
-				numbers.push(num);
-				break;
+			// symbol
+			const char* ck = numsym[i].c_str();
+			switch(hash_str_to_uint32(ck)){
+			case hash_str_to_uint32("+"):
+								num = (a+b);
+			numbers.push(num);
+			break;
 
-			case'-':
-				num =(b-a);
-				numbers.push(num);
-				break;
-			case'*':
-				num = a*b;
-				numbers.push(num);
-				break;
-			case'/':
-				if(a==(0)){
-					cout<<"denominator cannot be 0"<<endl;
-					break;
-				}
-				num = b/a;
-				numbers.push(num);
-				break;
+			case hash_str_to_uint32("-"):
+								num =(b-a);
+			numbers.push(num);
+			break;
+			case hash_str_to_uint32("*"):
+								num = a*b;
+			numbers.push(num);
+			break;
+			case hash_str_to_uint32("/"):
+								if(a==(0)){
+									cout<<"denominator cannot be 0"<<endl;
+									break;
+								}
+			num = b/a;
+			numbers.push(num);
+			break;
 			}
 		}
-		k++;
+		i++;
 	}
 	float result = numbers.top();
 	cout<<result<<endl;
-
 }
 
-
-
-
+// main
 int main() {
 	int i = 1;
 	while(i==1){
@@ -134,3 +216,5 @@ int main() {
 		scanf("%d",&i);
 	}
 }
+
+
