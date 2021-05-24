@@ -53,7 +53,7 @@ int prio(string ch){
 	return ans;
 }
 
-// check if char a is +-*/
+// check if char a is +-*/1
 int isCharSymbol(char a){
 
 	if(a=='+' || a=='-'
@@ -90,15 +90,18 @@ void convert(){
 	cin>>ch;
 	stack<string> symbol;
 	//-----------seperated with space
-	for(long long unsigned int i=1; i<=ch.length(); i++){
+	for(long long unsigned int i=0; i<ch.length(); i++){
 		if(isCharSymbol(ch[i])==1){
-			ch.insert(i," ");
-			i++;
+			int j = i-2;
+			int k = i-1;
+			if(k!=-1 && isCharSymbol(ch[j])==0){ // not pre-space for first char && no pre-space for two consecutive char
+				ch.insert(i," ");
+				i++;
+			}
 			ch.insert(++i," ");
-		}
 	}
-	//	cout<<ch<<"end"<<endl;
-
+		cout<<ch<<"end"<<endl;
+	}
 	//to string array with delimitor ' '
 	vector<string> cin;
 	stringstream ss(ch);
@@ -146,12 +149,12 @@ void convert(){
 		symbol.pop();
 	}
 
-	//	// print 後綴
-	//
-	//		for(string k : nusmsym){
-	//			cout<<k;
-	//		}
-
+//		// print 後綴
+//
+			for(string k : numsym){
+				cout<<k<<",";
+			}
+			printf("\n");
 }
 
 // convert string to float
@@ -181,14 +184,21 @@ void calc(){
 			if(numsym[i]=="+"){
 				num = (a+b);
 				numbers.push(num);
+//				printf("+\n");
+//				cout<<num<<endl;
 			}
 			else if(numsym[i]=="-"){
 				num =(b-a);
 				numbers.push(num);
+//				cout<<num<<endl;
+//				printf("-\n");
+
 			}
 			else if(numsym[i]=="*"){
 				num = a*b;
 				numbers.push(num);
+//				cout<<num<<endl;
+//				printf("*\n");
 			}
 			else if(numsym[i]=="/"){
 				if(a==(0)){
@@ -196,7 +206,9 @@ void calc(){
 					break;
 				}
 				num = b/a;
-				numbers.push(num);
+				cout<<num<<endl;
+//				numbers.push(num);
+//				printf("/\n");
 			}
 		}
 		i++;
