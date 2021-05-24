@@ -12,8 +12,8 @@
 #include <cstring>
 #include <sstream>
 #include <vector>
-#include <stdlib.h>
-#include <math.h>
+
+
 
 using namespace std;
 
@@ -121,7 +121,7 @@ void convert(){
 			symbol.push(n);
 		}
 		else{
-			while(prio(n)<prio(symbol.top())){
+			while(prio(n)<=prio(symbol.top())){
 				numsym[i++]=symbol.top();
 				symbol.pop();
 				if(symbol.empty()){
@@ -138,13 +138,12 @@ void convert(){
 		symbol.pop();
 	}
 
-	// print 後綴
-	//	int m = 0;
-	//	cout<<m;
-	//	for(string k : numsym){
-	//		m=m+1;
-	//	}
-	//	cout<<m;
+//	// print 後綴
+//
+//		for(string k : nusmsym){
+//			cout<<k;
+//		}
+
 }
 
 // convert string to float
