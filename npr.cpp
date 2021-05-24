@@ -5,7 +5,7 @@
 // Copyright   : Your copyright notice
 // Description : Hello World in C++, Ansi-style
 //============================================================================
-#include <string>
+
 #include <iostream>
 #include <stack>
 #include <stdio.h>
@@ -30,17 +30,33 @@ constexpr std::uint32_t hash_str_to_uint32(const char* data)
 }
 
 // set up priority
-int prio(string ck){
+int prio(string ch){
 	int ans;
-	const char* ch = ck.c_str();
-	switch(hash_str_to_uint32(ch)){
-	case hash_str_to_uint32("("):ans=0;break;
-	case hash_str_to_uint32("+"):
-	case hash_str_to_uint32("-"):ans=1;break;
-	case hash_str_to_uint32("*"):
-	case hash_str_to_uint32("/"):ans=2;break;
-	case hash_str_to_uint32(")"):ans=3;break;
-	default:ans=-1;break;
+	//	const char* ch = ck.c_str();
+	//	switch(hash_str_to_uint32(ch)){
+	//	case hash_str_to_uint32("("):ans=0;break;
+	//	case hash_str_to_uint32("+"):
+	//	case hash_str_to_uint32("-"):ans=1;break;
+	//	case hash_str_to_uint32("*"):
+	//	case hash_str_to_uint32("/"):ans=2;break;
+	//	case hash_str_to_uint32(")"):ans=3;break;
+	//	default:ans=-1;break;
+	//	}
+
+	if(ch=="("){
+		ans=0;
+	}
+	else if(ch=="+" || ch=="-"){
+		ans=1;
+	}
+	else if(ch=="*" || ch=="/"){
+		ans=2;
+	}
+	else if(ch==")"){
+		ans=3;
+	}
+	else{
+		ans=-1;
 	}
 	return ans;
 }
@@ -138,11 +154,11 @@ void convert(){
 		symbol.pop();
 	}
 
-//	// print 後綴
-//
-//		for(string k : nusmsym){
-//			cout<<k;
-//		}
+	//	// print 後綴
+	//
+	//		for(string k : nusmsym){
+	//			cout<<k;
+	//		}
 
 }
 
@@ -170,29 +186,25 @@ void calc(){
 			float b = numbers.top();
 			numbers.pop();
 			// symbol
-			const char* ck = numsym[i].c_str();
-			switch(hash_str_to_uint32(ck)){
-			case hash_str_to_uint32("+"):
-								num = (a+b);
-			numbers.push(num);
-			break;
-
-			case hash_str_to_uint32("-"):
-								num =(b-a);
-			numbers.push(num);
-			break;
-			case hash_str_to_uint32("*"):
-								num = a*b;
-			numbers.push(num);
-			break;
-			case hash_str_to_uint32("/"):
-								if(a==(0)){
-									cout<<"denominator cannot be 0"<<endl;
-									break;
-								}
-			num = b/a;
-			numbers.push(num);
-			break;
+			if(numsym[i]=="+"){
+				num = (a+b);
+				numbers.push(num);
+			}
+			else if(numsym[i]=="-"){
+				num =(b-a);
+				numbers.push(num);
+			}
+			else if(numsym[i]=="*"){
+				num = a*b;
+				numbers.push(num);
+			}
+			else if(numsym[i]=="/"){
+				if(a==(0)){
+					cout<<"denominator cannot be 0"<<endl;
+					break;
+				}
+				num = b/a;
+				numbers.push(num);
 			}
 		}
 		i++;
